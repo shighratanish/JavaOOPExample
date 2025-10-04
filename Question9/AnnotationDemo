@@ -1,0 +1,36 @@
+import java.lang.annotation.*;
+import java.lang.reflect.*;
+
+// Define custom annotation
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+@interface TrackExecution {
+    String value() default "Executing...";
+}
+
+class Task {
+    @TrackExecution("Starting task 1")
+    public void task1() {
+        System.out.println("Task 1 running");
+    }
+
+    @TrackExecution("Starting task 2")
+    public void task2() {
+        System.out.println("Task 2 running");
+    }
+}
+
+public class AnnotationDemo {
+    public static void main(String[] args) throws Exception {
+        Task t = new Task();
+        Method[] methods = t.getClass().getDeclaredMethods();
+
+        for (Method m : methods) {
+            if (m.isAnnotationPresent(TrackExecution.class)) {
+                TrackExecution te = m.getAnnotation(TrackExecution.class);
+                System.out.println("Annotation found: " + te.value());
+                m.invoke(t);
+            }
+        }
+    }
+}
